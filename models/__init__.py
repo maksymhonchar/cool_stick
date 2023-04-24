@@ -1,3 +1,3 @@
-from models.experimentmodel import ExperimentModel
+from models.camera import Camera
 
-__all__ = ["ExperimentModel"]
+__all__ = ["Camera"]

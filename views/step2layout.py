@@ -1,21 +1,60 @@
-from PyQt5.QtWidgets import QBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget, QFrame
+from PyQt5.QtWidgets import (QBoxLayout, QHBoxLayout, QLabel, QPushButton,
+                             QVBoxLayout)
+
+from views.steplayout import StepLayout
 
 
-class Step2Layout:
+class Step2Layout(StepLayout):
+
     def create(self) -> QBoxLayout:
-        box_layout_2 = QVBoxLayout()
-        box_layout_2.addWidget(QLabel("Box Layout 2"))
-        box_layout_2.addWidget(QPushButton("Button 2"))
+        # Create step description
+        step_description = "Step 2: Get Experiment Images"
+        step_description_label = self._create_step_description_label(step_description)
+        # Create left/right cameras UI
+        cameras_layout = self._create_cameras_layout()
+        # Create separator line
+        steps_separator_frame = self._create_separator_frame()
+        # Create step layout
+        step_layout = QVBoxLayout()
+        step_layout.addWidget(step_description_label)
+        step_layout.addLayout(cameras_layout)
+        step_layout.addWidget(steps_separator_frame)
+        return step_layout
 
-        # Add separator line
-        line_separator = self._create_line_separator()
-        box_layout_2.addWidget(line_separator)
+    def _create_cameras_layout(self) -> QHBoxLayout:
+        cameras_layout = QHBoxLayout()
+        left_camera_layout = self._create_left_camera_layout()
+        right_camera_layout = self._create_right_camera_layout()
+        cameras_layout.addLayout(left_camera_layout)
+        cameras_layout.addLayout(right_camera_layout)
+        return cameras_layout
 
-        return box_layout_2
+    def _create_left_camera_layout(self) -> QVBoxLayout:
+        # Create ui items
+        self.left_camera_label = QLabel(self.parent)
+        self.left_camera_label.setFixedSize(640, 480)
+        self.left_camera_label.setStyleSheet("background-color: grey;")
+        self.left_camera_button = QPushButton("LC: Take Picture", self.parent)
+        # Create controls layout
+        left_camera_controls_layout = QHBoxLayout()
+        left_camera_controls_layout.addWidget(self.left_camera_button)
+        # Create camera layout
+        left_camera_layout = QVBoxLayout()
+        left_camera_layout.addLayout(left_camera_controls_layout)
+        left_camera_layout.addWidget(self.left_camera_label)
+        return left_camera_layout
 
-    def _create_line_separator(self) -> QWidget:
-        line = QFrame()
-        line.setFrameShape(QFrame.HLine)
-        line.setFrameShadow(QFrame.Sunken)
-        line.setLineWidth(1)
-        return line
+    def _create_right_camera_layout(self) -> QVBoxLayout:
+        # Create ui items
+        self.right_camera_label = QLabel(self.parent)
+        self.right_camera_label.setFixedSize(640, 480)
+        self.right_camera_label.setStyleSheet("background-color: grey;")
+        self.right_camera_button = QPushButton("RC: Take Picture", self.parent)
+        # Create controls layout
+        right_camera_controls_layout = QHBoxLayout()
+        right_camera_controls_layout.addWidget(self.right_camera_button)
+        # Create camera layout
+        right_camera_layout = QVBoxLayout()
+        right_camera_layout.addLayout(right_camera_controls_layout)
+        right_camera_layout.addWidget(self.right_camera_label)
+        return right_camera_layout

@@ -1,3 +1,3 @@
-from controllers.maincontroller import MainController
+from controllers.appcontroller import AppController
 
-__all__ = ["MainController"]
+__all__ = ["AppController"]

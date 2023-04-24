@@ -15,12 +15,14 @@ class VideoThread(QThread):
         self.is_running = False
 
     def run(self) -> None:
+        print('hi videothread.run')
         # Try to create video capturing from camera
         api_preference = self._get_video_capture_api_preference()
         video_capture = cv2.VideoCapture(self.camera_index, api_preference)
         # Continuously capture frames and emit them as QImage objects
         self.is_running = True
         while self.is_running:
+            print('hi self.is_running')
             frame_read_ok, frame = video_capture.read()
             if frame_read_ok:
                 qt_image = self.frame_to_qimage(frame)
@@ -29,6 +31,8 @@ class VideoThread(QThread):
 
     def stop(self) -> None:
         self.is_running = False
+        self.quit()
+        self.wait()
 
     @staticmethod
     def _get_video_capture_api_preference() -> int:
@@ -49,10 +53,10 @@ class VideoThread(QThread):
         bytes_per_line = ch * w
         qbyte_array = QByteArray(rgb_frame.tobytes())
         qt_image = QImage(
-            data=qbyte_array,
-            width=w,
-            height=h,
-            bytesPerLine=bytes_per_line,
-            format=QImage.Format_RGB888,
+            qbyte_array,
+            w,
+            h,
+            bytes_per_line,
+            QImage.Format_RGB888,
         )
         return qt_image
