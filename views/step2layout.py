@@ -35,6 +35,13 @@ class Step2Layout(StepLayout):
         self.left_camera_label.setFixedSize(640, 480)
         self.left_camera_label.setStyleSheet("background-color: grey;")
         self.left_camera_button = QPushButton("LC: Take Picture", self.parent)
+        # Save ui items
+        self.ui_items.update(
+            {
+                'left_camera_label': self.left_camera_label,
+                'left_camera_button': self.left_camera_button,
+            }
+        )
         # Create controls layout
         left_camera_controls_layout = QHBoxLayout()
         left_camera_controls_layout.addWidget(self.left_camera_button)
@@ -50,6 +57,13 @@ class Step2Layout(StepLayout):
         self.right_camera_label.setFixedSize(640, 480)
         self.right_camera_label.setStyleSheet("background-color: grey;")
         self.right_camera_button = QPushButton("RC: Take Picture", self.parent)
+        # Save ui items
+        self.ui_items.update(
+            {
+                'right_camera_label': self.right_camera_label,
+                'right_camera_button': self.right_camera_button,
+            }
+        )
         # Create controls layout
         right_camera_controls_layout = QHBoxLayout()
         right_camera_controls_layout.addWidget(self.right_camera_button)

@@ -1,17 +1,21 @@
-from typing import List, Callable, Dict
+from typing import Callable, Dict, List
 
+import cv2
+import numpy as np
+from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtMultimedia import QCameraInfo
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QImage, QPixmap
 
-from views import AppView
 from models import Camera
+from views import AppView
 
 
 class AppController:
     def __init__(self, app_view: AppView) -> None:
         self.app_view = app_view
         self.step1_ui_items = self.app_view.step_data['step_1'].ui_items
+        self.step2_ui_items = self.app_view.step_data['step_2'].ui_items
+        self.step3_ui_items = self.app_view.step_data['step_3'].ui_items
         self._connect()
         self._update_list_of_webcams()
 
@@ -77,19 +81,11 @@ class AppController:
     # step 1 signals
 
     def _connect_step1_signals(self) -> None:
-        # Left camera items
         self.step1_ui_items["left_camera_start_button"].clicked.connect(
             self.start_left_camera
         )
-        self.step1_ui_items["left_camera_stop_button"].clicked.connect(
-            self.stop_left_camera
-        )
-        # Right camera items
         self.step1_ui_items["right_camera_start_button"].clicked.connect(
             self.start_right_camera
-        )
-        self.step1_ui_items["right_camera_stop_button"].clicked.connect(
-            self.stop_right_camera
         )
 
     def start_left_camera(self) -> None:
@@ -97,19 +93,18 @@ class AppController:
         left_camera_combo = self.step1_ui_items['left_camera_combo']
         left_camera_index = int(left_camera_combo.currentText().split(":")[0])
         self.left_camera = Camera(left_camera_index)
-        # Connect camera signal to pixmap
+        # Connect camera signals
         self.left_camera.video_thread.pixmap_changed_signal.connect(
-            self.set_left_camera_frame
+            self.set_left_camera_label
+        )
+        self.step1_ui_items["left_camera_stop_button"].clicked.connect(
+            self.left_camera.stop
         )
         # Start the camera
-        self.left_camera.video_thread.start()
+        self.left_camera.start()
 
-    def stop_left_camera(self) -> None:
-        self.left_camera.video_thread.stop()
-
-    def set_left_camera_frame(self, image: QImage) -> None:
-        image_as_qpixmap = QPixmap.fromImage(image)
-        self.step1_ui_items['left_camera_label'].setPixmap(image_as_qpixmap)
+    def set_left_camera_label(self, pixmap: QPixmap) -> None:
+        self.step1_ui_items['left_camera_label'].setPixmap(pixmap)
 
     def start_right_camera(self) -> None:
         # Update camera instance
@@ -118,24 +113,41 @@ class AppController:
         self.right_camera = Camera(right_camera_index)
         # Connect camera signal to pixmap
         self.right_camera.video_thread.pixmap_changed_signal.connect(
-            self.set_right_camera_frame
+            self.set_right_camera_label
+        )
+        self.step1_ui_items["right_camera_stop_button"].clicked.connect(
+            self.right_camera.stop
         )
         # Start the camera
-        self.right_camera.video_thread.start()
+        self.right_camera.start()
 
-    def stop_right_camera(self) -> None:
-        self.right_camera.video_thread.stop()
-
-    def set_right_camera_frame(self, image: QImage) -> None:
-        image_as_qpixmap = QPixmap.fromImage(image)
-        self.step1_ui_items['right_camera_label'].setPixmap(image_as_qpixmap)
+    def set_right_camera_label(self, pixmap: QPixmap) -> None:
+        self.step1_ui_items['right_camera_label'].setPixmap(pixmap)
 
     # step 2 signals
 
     def _connect_step2_signals(self) -> None:
-        pass
+        self.step2_ui_items["left_camera_button"].clicked.connect(
+            self._set_left_camera_screenshot_label
+        )
+        self.step2_ui_items["right_camera_button"].clicked.connect(
+            self._set_right_camera_screenshot_label
+        )
+
+    def _set_left_camera_screenshot_label(self) -> None:
+        pixmap = self.step1_ui_items["left_camera_label"].pixmap()
+        self.step2_ui_items["left_camera_label"].setPixmap(pixmap)
+
+    def _set_right_camera_screenshot_label(self) -> None:
+        pixmap = self.step1_ui_items["right_camera_label"].pixmap()
+        self.step2_ui_items["right_camera_label"].setPixmap(pixmap)
 
     # step 3 signals
 
     def _connect_step3_signals(self) -> None:
+        self.step3_ui_items["find_spots_button"].clicked.connect(
+            self._find_spots_button_clicked
+        )
+
+    def _find_spots_button_clicked(self) -> None:
         pass
