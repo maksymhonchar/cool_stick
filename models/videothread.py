@@ -2,8 +2,7 @@ import platform
 
 import cv2
 import numpy as np
-from PyQt5.QtCore import QByteArray, QThread
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtCore import QThread
 
 
 class VideoThread(QThread):
@@ -22,16 +21,16 @@ class VideoThread(QThread):
         while self.is_running:
             frame_read_ok, frame = video_capture.read()
             if frame_read_ok:
-                frame_as_pixmap = self.frame_to_qpixmap(frame)
-                self._emit_pixmap_changed_signal(frame_as_pixmap)
+                self._emit_frame_changed_signal(frame)
         video_capture.release()
+        print('video_capture released')
 
     def stop(self) -> None:
         self.is_running = False
         self.quit()
         self.wait()
 
-    def _emit_pixmap_changed_signal(self, pixmap: QPixmap) -> None:
+    def _emit_frame_changed_signal(self, frame: np.ndarray) -> None:
         raise NotImplementedError
 
     @staticmethod
@@ -45,19 +44,3 @@ class VideoThread(QThread):
                 return cv2.CAP_MSMF
         default_api_preference = cv2.CAP_V4L2
         return default_api_preference
-
-    @staticmethod
-    def frame_to_qpixmap(frame: np.ndarray) -> QPixmap:
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgb_frame.shape
-        bytes_per_line = ch * w
-        qbyte_array = QByteArray(rgb_frame.tobytes())
-        frame_as_qimage = QImage(
-            qbyte_array,
-            w,
-            h,
-            bytes_per_line,
-            QImage.Format_RGB888,
-        )
-        frame_as_qpixmap = QPixmap.fromImage(frame_as_qimage)
-        return frame_as_qpixmap

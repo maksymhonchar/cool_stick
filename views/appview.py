@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import Dict, List
+from typing import Dict
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QAction, QLabel, QMainWindow, QScrollArea,
@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import (QAction, QLabel, QMainWindow, QScrollArea,
 from views.step1layout import Step1Layout
 from views.step2layout import Step2Layout
 from views.step3layout import Step3Layout
-from views.steplayout import StepLayout
 
 
 class AppView(QMainWindow):

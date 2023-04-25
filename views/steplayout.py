@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QFrame, QLabel, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QFrame, QLabel, QVBoxLayout
 
 
 class StepLayout(QVBoxLayout):

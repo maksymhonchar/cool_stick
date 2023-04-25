@@ -1,4 +1,3 @@
-from typing import List
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QVBoxLayout
 
 from views.steplayout import StepLayout

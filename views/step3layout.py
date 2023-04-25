@@ -52,7 +52,7 @@ class Step3Layout(StepLayout):
         algorithm_layout.addWidget(self.find_p_coords_button)
         algorithm_layout.addWidget(self.find_p_coords_label)
         return algorithm_layout
-    
+
     @staticmethod
     def _set_fixed_size(button: QPushButton) -> None:
         button.setFixedSize(button.sizeHint())
