@@ -2,12 +2,11 @@ import platform
 
 import cv2
 import numpy as np
-from PyQt5.QtCore import QByteArray, QThread, pyqtSignal
+from PyQt5.QtCore import QByteArray, QThread
 from PyQt5.QtGui import QImage, QPixmap
 
 
 class VideoThread(QThread):
-    pixmap_changed_signal = pyqtSignal(QPixmap)
 
     def __init__(self, camera_index: int):
         super().__init__()
@@ -24,13 +23,16 @@ class VideoThread(QThread):
             frame_read_ok, frame = video_capture.read()
             if frame_read_ok:
                 frame_as_pixmap = self.frame_to_qpixmap(frame)
-                self.pixmap_changed_signal.emit(frame_as_pixmap)
+                self._emit_pixmap_changed_signal(frame_as_pixmap)
         video_capture.release()
 
     def stop(self) -> None:
         self.is_running = False
         self.quit()
         self.wait()
+
+    def _emit_pixmap_changed_signal(self, pixmap: QPixmap) -> None:
+        raise NotImplementedError
 
     @staticmethod
     def _get_video_capture_api_preference() -> int:

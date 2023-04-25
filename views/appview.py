@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import Dict
+from typing import Dict, List
 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QAction, QLabel, QMainWindow, QScrollArea,
@@ -17,7 +17,9 @@ class AppView(QMainWindow):
         super().__init__()
         # Init variables
         self.menu_data: Dict[str, Dict[str, QAction]] = OrderedDict()
-        self.step_data: Dict[str, StepLayout] = OrderedDict()
+        self.step1_layout = Step1Layout()
+        self.step2_layout = Step2Layout()
+        self.step3_layout = Step3Layout()
         # Init UI
         self.init_ui()
 
@@ -26,7 +28,7 @@ class AppView(QMainWindow):
         self._set_window_icon()
         self._set_window_title()
         self._add_menus()
-        self._create_layout()
+        self._add_layout()
         self._add_status_bar()
 
     def _set_mainwindow_size(self) -> None:
@@ -35,76 +37,47 @@ class AppView(QMainWindow):
         self.setMinimumSize(min_width, min_height)
 
     def _set_window_icon(self) -> None:
-        window_icon_file_path = os.environ.get("WINDOW_ICON_FILE_PATH", "")
+        window_icon_file_path = os.environ.get("WINDOW_ICON_FILE_PATH_ENV_VAR")
         if window_icon_file_path:
             window_icon_as_qicon = QIcon(window_icon_file_path)
             self.setWindowIcon(window_icon_as_qicon)
 
     def _set_window_title(self) -> None:
-        window_title = os.environ.get("WINDOW_TITLE", "")
+        window_title = os.environ.get("WINDOW_TITLE_ENV_VAR")
         if window_title:
             self.setWindowTitle(window_title)
 
     def _add_menus(self) -> None:
-        self._add_file_menu()
-        self._add_tools_menu()
-
-    def _add_file_menu(self) -> None:
-        # Save submenus
-        self.menu_data["file"] = OrderedDict(
-            {
-                "&Save experiment": QAction("&Save experiment", self),
-                "&Open experiment": QAction("&Open experiment", self),
-                "&Quit": QAction("&Quit", self),
-            }
+        menus_and_submenus_names = (
+            ("&File", ("&Save experiment", "&Open experiment", "&Quit", )),
+            ("&Tools", ("&Update list of webcams", )),
         )
-        # Add menu
-        menu = self.menuBar().addMenu("&File")
-        # Add submenus
-        for _, submenu_action in self.menu_data["file"].items():
-            menu.addAction(submenu_action)
+        for (menu_name, submenus) in menus_and_submenus_names:
+            # Add menu
+            menu = self.menuBar().addMenu(menu_name)
+            self.menu_data[menu_name] = OrderedDict()
+            # Add submenus
+            for submenu_name in submenus:
+                submenu_qaction = QAction(submenu_name, self)
+                menu.addAction(submenu_qaction)
+                self.menu_data[menu_name].update({submenu_name: submenu_qaction})
 
-    def _add_tools_menu(self) -> None:
-        # Save submenus
-        self.menu_data["tools"] = OrderedDict(
-            {
-                "&Update list of webcams": QAction("&Update list of webcams", self)
-            }
-        )
-        # Add menu
-        menu = self.menuBar().addMenu("&Tools")
-        # Add submenus
-        for _, submenu_action in self.menu_data["tools"].items():
-            menu.addAction(submenu_action)
-
-    def _create_layout(self) -> None:
+    def _add_layout(self) -> None:
+        # Create main layout
+        main_layout = QVBoxLayout()
+        for step_layout in [self.step1_layout, self.step2_layout, self.step3_layout]:
+            step_layout.init_ui()
+            main_layout.addLayout(step_layout)
         # Create a widget to hold the main layout
         main_widget = QWidget(self)
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(main_widget)
-        main_layout = self._create_steps_layout()
         main_widget.setLayout(main_layout)
         # Set the main widget for the window
         self.setCentralWidget(scroll_area)
 
-    def _create_steps_layout(self) -> QVBoxLayout:
-        # Save layouts
-        self.step_data.update(
-            {
-                'step_1': Step1Layout(self),
-                'step_2': Step2Layout(self),
-                'step_3': Step3Layout(self)
-            }
-        )
-        # Add layouts
-        main_layout = QVBoxLayout()
-        for _, step_layout_cls in self.step_data.items():
-            step_layout = step_layout_cls.create()
-            main_layout.addLayout(step_layout)
-        return main_layout
-
     def _add_status_bar(self) -> None:
-        text = os.environ.get("STATUS_BAR_DEFAULT_TEXT", "")
-        label = QLabel(text)
-        self.statusBar().addWidget(label)
+        status_bar_text = os.environ.get("STATUS_BAR_DEFAULT_TEXT_ENV_VAR")
+        self.status_bar_label = QLabel(status_bar_text)
+        self.statusBar().addWidget(self.status_bar_label)

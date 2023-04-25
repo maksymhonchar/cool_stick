@@ -1,3 +1,4 @@
-from models.camera import Camera
+from models.leftcamera import LeftCamera
+from models.rightcamera import RightCamera
 
-__all__ = ["Camera"]
+__all__ = ["LeftCamera", "RightCamera"]
